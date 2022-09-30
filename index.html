@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transform HTML text</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container mt-5" id="container">
+    <h1 class="my-5">Transform HTML text</h1>
+    <input type="file" class="form-control" id="file-selector" multiaccept=".html">
+
+    
+    <script src="./transformHtml.js"></script>
+    <script>
+      
+      function readImage(file) {
+        // Check if the file is an image.
+        if (file.type && file.type !== 'text/html') {
+          console.log('File is not an HTML document.', file.type, file);
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.addEventListener('load', event => {
+          const origHtml = event.target.result
+          const parsedHtml = transformHTML(origHtml).innerHTML;
+          
+          
+          const c = document.createElement("a");
+          c.className = "btn btn-primary my-5";
+          c.download = "parsed.html";
+          c.text = "Download";
+          
+          var t = new Blob([parsedHtml], {
+            type: "text/html"
+          });
+          c.href = window.URL.createObjectURL(t);
+          c.outerHTML = `<div class="my-2">${c.innerHTML}</div>`
+          document.getElementById('container').append(c);
+
+          // Textarea
+          const ta = document.createElement('textarea');
+          ta.style.width = '100%';
+          ta.style.height = '500px'
+          ta.value = parsedHtml;
+          document.getElementById('container').append(ta);
+        });
+        reader.readAsText(file);
+      }
+      
+      const fileSelector = document.getElementById('file-selector');
+      fileSelector.addEventListener('change', (event) => {
+        const file= event.target.files[0];
+        readImage(file);
+      });
+
+    </script>
+  </div>
+</body>
+</html>
