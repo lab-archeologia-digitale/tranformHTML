@@ -1,14 +1,3 @@
-const cleanAndMove = (oldContainer, querySel, newElement, options) => {
-  const el = oldContainer.querySelector(querySel);
-  const text = el.innerText;
-  const newEl = document.createElement(newElement)
-  newEl.innerText = text;
-  if (options && options.className){
-    newEl.className = options.className;
-  }
-  return newEl;
-}
-
 const getContents = (oldContainer) => {
 
   // Gets element with .Key-Words className
@@ -19,6 +8,7 @@ const getContents = (oldContainer) => {
   
   // Creates new deiv node and populates with HTML
   const newNodeText = document.createElement('div');
+  newNodeText.classList.add('main-documents');
   newNodeText.innerHTML = articleText;
   
   // Returns new node
@@ -30,11 +20,11 @@ const createGallery = (oldContainer) => {
 
   // Create new gallery div container with classname gallery-container
   const gallContainer = document.createElement('div');
-  gallContainer.className = 'gallery-container';
+  gallContainer.classList.add('gallery-container');
 
   // Creates new ul element with className gallery and appends to gallery container
   const ul = document.createElement('ul');
-  ul.className = 'gallery';
+  ul.classList.add('gallery');
   gallContainer.append(ul);
 
   // Gets old paragraph elements with className Caption, and for each of them:
@@ -42,6 +32,10 @@ const createGallery = (oldContainer) => {
 
     // Gets text
     const caption = captionEl.innerText;
+
+    // Gets figure id
+    const matchid = caption.match(/(Figure|Plate)\s*(\d+)/);
+    const imgId = (matchid[1] && matchid[2]) ? matchid[1].toLowerCase() + '_' + matchid[2] : `rndid_${Math.random().toString().substr(2, 8)}`;
     
     // Gets image name from src
     const src = captionEl.parentElement.previousElementSibling.querySelector('img').src;
@@ -49,6 +43,7 @@ const createGallery = (oldContainer) => {
 
     // Creates new list item element with attribute data-id containing image name
     const li = document.createElement('li');
+    li.id = imgId;
     li.setAttribute('data-id', imgName);
 
     // Sets new template as inner HTML
@@ -56,8 +51,6 @@ const createGallery = (oldContainer) => {
     <img src="${imgName}"  alt="${caption}" />
     </a>
     <div class="caption">${caption}</div>`;
-
-    console.log(ul)
 
     // Finally append list item to list container
     ul.append(li);
@@ -70,7 +63,7 @@ const formatBibliography = (newContainer) => {
   
   // Create bibliography ul container with className bibliography
   const biblioCont = document.createElement('ul');
-  biblioCont.className = 'bibliography';
+  biblioCont.classList.add('bibliography');
 
   // Loop into paragraph with classNale bibliography, and for each of them:
   for (const el of newContainer.querySelectorAll('p.bibliography') ){
@@ -134,11 +127,7 @@ const formatFootNotes = (newContainer) => {
     const noteText = newContainer.querySelector(`#note-text-${noteNr}`).innerHTML;
 
     // Fromat new template
-    el.parentNode.outerHTML = `
-      <a href="javascript:void(0);" class="ftpopover" id="${`bd-note-${noteNr}`}" data-content="${noteText.replace('"', '\"').trim()}">
-        ${el.innerText}
-      </a>
-    `;
+    el.parentNode.outerHTML = `<a href="javascript:void(0);" class="ftpopover" id="${`bd-note-${noteNr}`}" data-content="${noteText.replace('"', '\"').trim()}">${el.innerText}</a>`;
   }
 
   return newContainer;
@@ -147,12 +136,7 @@ const formatFootNotes = (newContainer) => {
 const transformHTML = (html) => {
   // Create oldContainer from HTML string
   const oldContainer = document.createElement('div');
-  oldContainer.innerHTML = html;
-
-  // Create div.article-text#newCointainer
-  let newContainer = document.createElement('div');
-  newContainer.className = 'article-text';
-  newContainer.id = 'newContainer';
+  oldContainer.innerHTML = html.trim();
 
   // Get all contents from oldContainer, do some cleaning, and add to new container
   const newContents =  getContents(oldContainer);
@@ -203,15 +187,35 @@ const transformHTML = (html) => {
   for (const el of newContents.querySelectorAll('.Chapter-heading,.Author,.Author-info,.Key-Words')){
     el.remove();
   }
-  newContainer.append(newContents);
 
+  // Parse galleries
+  const galleryContainer = createGallery(oldContainer);
+
+  // Replace Figure|Plate with link
+  newContents.innerHTML = newContents.innerHTML.replaceAll(/(Figure|Plate)\s*(\d+)/g, (match, p1, p2)=>{
+    const imgid = p1.toLowerCase() + '_'+ p2;
+    const captionEl = galleryContainer.querySelector(`#${imgid} .caption`);
+
+    const caption = captionEl.innerHTML.replace('"', '\"');
+    return `<a href="${galleryContainer.querySelector(`#${p1.toLowerCase()}_${p2} img`).getAttribute('src')}" data-fancybox="gallery" rel="gallery" data-caption="${caption}" title="${caption}">${match}</a>`;
+
+  });
+
+
+  // Create new main container div
+  let newContainer = document.createElement('div');
+
+  // Appends contents
+  newContainer.append(newContents);
 
   // Add horizontal rule to newContainer to separate image gallery
   newContainer.append(document.createElement('hr'));
 
   // Create gallery and append to newContainer
-  const galleryContainer = createGallery(oldContainer);
   newContainer.append(galleryContainer);
+
+  
+  
 
   // Format bibliography, already moved in
   newContainer = formatBibliography(newContainer);

@@ -25,7 +25,7 @@
         const reader = new FileReader();
         reader.addEventListener('load', event => {
           const origHtml = event.target.result
-          const parsedHtml = transformHTML(origHtml).innerHTML;
+          const parsedHtml = transformHTML(origHtml).innerHTML.replace(/\t+\n/g, '\n').replace(/\s+\n/g, '\n');
           
           
           const c = document.createElement("a");

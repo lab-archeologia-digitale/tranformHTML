@@ -28,3 +28,4 @@ It relies on some convetions in composing the Indeseign file.
   - `a._idFootnoteLink` is used to detect footnote references in the text
 15. `p.Normal` is simplified into `p`
 16. `span.Regular` tags are removed.
+17. Text patterns such as Figure n or Plate n are replaced with links
