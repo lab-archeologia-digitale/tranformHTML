@@ -1,7 +1,19 @@
-export default function formatFootNotes (newContainer) {
+/**
+ * Gets all footnotes texts from original HTML element by looking for div._idFootnote,
+ * removes note number from note text,
+ * and reformats notes text by applying the template.
+ * 
+ * Gets all in-text note references by looking for a._idFootnoteLink,
+ * and applies the new template to each of them
+ * 
+ * Returns the updated HTML Element
+ * @param {HTMLElement} htmlElement HTML Element containing original HTML code
+ * @returns {HTMLElement} HTML Element with formatted footnotes appended
+ */
+export default function formatFootNotes (htmlElement) {
 
   // Get all div elements with className _idFootnote (footnotes text at the end of the document), and for each of them:
-  for (const el of newContainer.querySelectorAll('div._idFootnote')){
+  for (const el of htmlElement.querySelectorAll('div._idFootnote')){
 
     // Get inner text of a element: this is the note number
     const noteNr = el.querySelector('a').innerText;
@@ -27,17 +39,17 @@ export default function formatFootNotes (newContainer) {
   }
   
   // Get all a elements with className _idFootnoteLink (in line footnotes references), and for each of them:
-  for (const el of newContainer.querySelectorAll('a._idFootnoteLink') ){
+  for (const el of htmlElement.querySelectorAll('a._idFootnoteLink') ){
     
     // Get inner text of a element: this is the note number
     const noteNr = el.innerText;
 
     // Get foot note HTML form the note liste at the end of the document
-    const noteText = newContainer.querySelector(`#note-text-${noteNr}`).innerHTML;
+    const noteText = htmlElement.querySelector(`#note-text-${noteNr}`).innerHTML;
 
     // Fromat new template
     el.parentNode.outerHTML = `<a href="javascript:void(0);" class="ftpopover" id="${`bd-note-${noteNr}`}" data-content="${noteText.replace('"', '\"').trim()}">${el.innerText}</a>`;
   }
 
-  return newContainer;
+  return htmlElement;
 };
