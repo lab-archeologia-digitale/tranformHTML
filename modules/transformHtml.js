@@ -1,7 +1,7 @@
-import formatFootNotes from './formatFootNotes.mjs';
-import createGallery from './createGallery.mjs';
-import formatBibliography from './formatBibliography.mjs';
-import getArticleContents from './getArticleContents.mjs';
+import formatFootNotes from './formatFootNotes.js';
+import createGallery from './createGallery.js';
+import formatBibliography from './formatBibliography.js';
+import getArticleContents from './getArticleContents.js';
 
 /**
  * 
