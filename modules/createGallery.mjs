@@ -1,3 +1,12 @@
+/**
+ * Caption elements are marked by class name "Caption",
+ * while Images are not so easy to get. The system relies on the order of the elements
+ * From the caption element, we move up one level and then get the previous sibling, 
+ * that normally (but not always) contains the image.
+ * If the image is not found an error is logged in the console.
+ * @param {HTMLElement} oldContainer: HTML Element with original article
+ * @returns {HTMLUListElement}: Html Ul Element with gallery images and captions reference
+ */
 export default function createGallery(oldContainer) {
 
   // Create new gallery div container with classname gallery-container
@@ -22,7 +31,7 @@ export default function createGallery(oldContainer) {
     // Tries to get image
     const imgEl = captionEl.parentElement.previousElementSibling.querySelector('img');
     if(!imgEl){
-      console.log(`Image not found for caption “${caption}”`);
+      console.log(`Image not found for caption “${caption}”. Probably it is not located in the right place (previous sibling of the parent of the caption)`);
       return;
     }
     const src = captionEl.parentElement.previousElementSibling.querySelector('img').src;

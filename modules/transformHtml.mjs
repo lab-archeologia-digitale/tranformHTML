@@ -86,7 +86,7 @@ export default function transformHTML (html) {
     const imgid = p1.toLowerCase() + '_'+ p2;
     const captionEl = galleryContainer.querySelector(`#${imgid} .caption`);
     if (!captionEl){
-      console.log(`Image not found for ${p1} ${p2}`);
+      console.log(`Image not found for ${p1} ${p2}. Probably it is not located in the right place (previous sibling of the parent of the caption)`);
       return;
     }
 
