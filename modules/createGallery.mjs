@@ -34,7 +34,7 @@ export default function createGallery(oldContainer) {
       console.log(`Image not found for caption “${caption}”. Probably it is not located in the right place (previous sibling of the parent of the caption)`);
       return;
     }
-    const src = captionEl.parentElement.previousElementSibling.querySelector('img').src;
+    const src = imgEl.src;
     const imgName = src.split('/').at(-1)
 
     // Creates new list item element with attribute data-id containing image name
@@ -50,7 +50,12 @@ export default function createGallery(oldContainer) {
 
     // Finally append list item to list container
     ul.append(li);
+    captionEl.remove();
+    imgEl.remove();
   });
 
-  return gallContainer;
+  return {
+    'galleryContainer': gallContainer,
+    'htmlWithNoImgLIst': oldContainer
+  };
 };

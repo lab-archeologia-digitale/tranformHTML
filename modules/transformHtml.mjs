@@ -30,7 +30,7 @@ import formatFootNotes from './formatFootNotes.mjs';
  */
 export default function transformHTML (html) {
 
-  const newHtmlDiv = document.createElement('div');
+  let newHtmlDiv = document.createElement('div');
   newHtmlDiv.innerHTML = html.trim();
 
   // Paragraphs with className Heading-1 are transformed into h2
@@ -96,9 +96,12 @@ export default function transformHTML (html) {
 
   
   // Parse galleries
-  const galleryContainer = createGallery(newHtmlDiv);
+  const {galleryContainer, htmlWithNoImgLIst} = createGallery(newHtmlDiv);
+
+  newHtmlDiv = htmlWithNoImgLIst;
 
   // Replace Figure|Plate with link
+  newHtmlDiv.innerHTML = newHtmlDiv.innerHTML.replaceAll('Fig.', 'Figure');
   newHtmlDiv.innerHTML = newHtmlDiv.innerHTML.replaceAll(/(Figure|Plate)\s*(\d+)/g, (match, p1, p2)=>{
     const imgid = p1.toLowerCase() + '_'+ p2;
     const captionEl = galleryContainer.querySelector(`#${imgid} .caption`);
@@ -141,6 +144,11 @@ export default function transformHTML (html) {
       }
     });
   }
+
+  // Remove empry tags
+  newContainer.querySelectorAll("div, span, p, strong").forEach(el => el.innerHTML.trim().replace(/\n|\r/g,'').trim() === "" && el.parentNode.removeChild(el))
+  newContainer.querySelectorAll("div, span, p, strong").forEach(el => el.innerHTML.trim().replace(/\n|\r/g,'').trim() === "" && el.parentNode.removeChild(el))
+  newContainer.querySelectorAll("div, span, p, strong").forEach(el => el.innerHTML.trim().replace(/\n|\r/g,'').trim() === "" && el.parentNode.removeChild(el))
 
   return newContainer;
 };
